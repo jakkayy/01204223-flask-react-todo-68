@@ -57,19 +57,8 @@ def get_todos():
     return jsonify([todo.to_dict() for todo in todos])
 
 def new_todo(data):
-    if len(todo_list) == 0:
-        id = 1
-    else:
-        id = 1 + max([todo['id'] for todo in todo_list])
-
-    if 'title' not in data:
-        return None
-    
-    return {
-        "id": id,
-        "title": data['title'],
-        "done": getattr(data, 'done', False),
-    }
+    return TodoItem(title=data['title'], 
+            done=data.get('done', False))
 
 @app.route('/api/todos/', methods=['POST'])
 def add_todo():
@@ -86,19 +75,15 @@ def add_todo():
 
 @app.route('/api/todos/<int:id>/toggle/', methods=['PATCH'])
 def toggle_todo(id):
-    todos = [todo for todo in todo_list if todo['id'] == id]
-    if not todos:
-        return (jsonify({'error': 'Todo not found'}), 404)
-    todo = todos[0]
-    todo['done'] = not todo['done']
-    return jsonify(todo)
+    todo = TodoItem.query.get_or_404(id)
+    todo.done = not todo.done
+    db.session.commit()
+    return jsonify(todo.to_dict())
 
 
 @app.route('/api/todos/<int:id>/', methods=['DELETE'])
 def delete_todo(id):
-    global todo_list
-    todos = [todo for todo in todo_list if todo['id'] == id]
-    if not todos:
-        return (jsonify({'error': 'Todo not found'}), 404)
-    todo_list = [todo for todo in todo_list if todo['id'] != id]
-    return jsonify({'message': 'Todo deleted successfully'})
+    todo = TodoItem.query.get_or_404(id)
+    db.session.selete(todo)
+    db.session.commit()
+    return jsonify({'message':'Todo deleted successfully'})
