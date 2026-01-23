@@ -16,7 +16,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todos.db'
 class Base(DeclarativeBase):
     pass
 
-db = SQLAlchemy(app, model_class=Base)
+db.init_app(app)
 migrate=Migrate(app, db)
         
 # with app.app_context():
