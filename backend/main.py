@@ -25,9 +25,22 @@ class TodoItem(db.Model):
             "title": self.title,
             "done": self.done
         }
+    
         
 with app.app_context():
     db.create_all()
+
+INITIAL_TODOS = [
+    TodoItem(title='Learn Flask'),
+    TodoItem(title='Build a Flask App'),
+]
+
+with app.app_context():
+    if TodoItem.query.count() == 0:
+         for item in INITIAL_TODOS:
+             db.session.add(item)
+         db.session.commit()
+
 
 todo_list = [
     { "id": 1,
@@ -40,7 +53,8 @@ todo_list = [
 
 @app.route('/api/todos/', methods=['GET'])
 def get_todos():
-    return jsonify(todo_list)
+    todos = TodoItem.query.all()
+    return jsonify([todo.to_dict() for todo in todos])
 
 def new_todo(data):
     if len(todo_list) == 0:
@@ -62,8 +76,9 @@ def add_todo():
     data = request.get_json()
     todo = new_todo(data)
     if todo:
-        todo_list.append(todo)
-        return jsonify(todo)
+        db.session.add(todo)
+        db.session.commit()
+        return jsonify(todo.to_dict())
     else:
         # return http response code 400 for bad requests
         return (jsonify({'error': 'Invalid todo data'}), 400)  
