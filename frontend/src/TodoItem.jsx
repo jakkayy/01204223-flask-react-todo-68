@@ -1,29 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-function TodoItem({ todo, fetchTodoList, toggleDone, deleteTodo }) {
+function TodoItem({ todo, toggleDone, deleteTodo, addNewComment }) {
   const [newComment, setNewComment] = useState("");
-
-  const TODOLIST_API_URL = 'http://localhost:5000/api/todos/';
-
-  async function addNewComment(todoId) {
-    try {
-      const url = `${TODOLIST_API_URL}${todoId}/comments/`;
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: newComment }),
-      });
-
-      if (response.ok) {
-        setNewComment("");
-        await fetchTodoList();
-      }
-    } catch (error) {
-      console.error("Error adding new comment:", error);
-    }
-  }
 
   return (
     <li>
@@ -43,13 +21,18 @@ function TodoItem({ todo, fetchTodoList, toggleDone, deleteTodo }) {
         </>
       )}
 
-      <div>
+      <div className="new-comment-forms">
         <input
           type="text"
           value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
+          onChange={(e) => {
+            setNewComment(e.target.value)}
+        }
         />
-        <button onClick={() => addNewComment(todo.id)}>
+        <button onClick={() => {
+            addNewComment(todo.id, newComment);
+            setNewComment("");
+        }}>
           Add Comment
         </button>
       </div>

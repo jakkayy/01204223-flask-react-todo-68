@@ -9,7 +9,7 @@ function App() {
 
   const [todoList, setTodoList] = useState([]);
   const [newTitle, setNewTitle] = useState("");
-  // const [newComments, setNewComments] = useState({});
+  const [newComments, setNewComments] = useState("");
 
   useEffect(() => {
     fetchTodoList();
@@ -76,24 +76,24 @@ function App() {
     }
   }
 
-  // async function addNewComment(todoId) {
-  //   try {
-  //     const url = `${TODOLIST_API_URL}${todoId}/comments/`;
-  //     const response = await fetch(url, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ 'message': newComments[todoId] || "" }),
-  //     });
-  //     if (response.ok) {
-  //       setNewComments({ ...newComments, [todoId]: "" });
-  //       await fetchTodoList();
-  //     }
-  //   } catch (error) {
-  //     console.error("Error adding new comment:", error);
-  //   }
-  // }
+  async function addNewComment(todoId, newComment) {     // เพิ่ม parameter
+    try {
+      const url = `${TODOLIST_API_URL}${todoId}/comments/`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 'message': newComment }),    // ใช้ newComment
+      });
+      if (response.ok) {
+        await fetchTodoList();
+      }
+    } catch (error) {
+      console.error("Error adding new comment:", error);
+    }
+  }
+
 
   return (
     <>
@@ -103,9 +103,9 @@ function App() {
           <TodoItem
             key={todo.id}
             todo={todo}
-            fetchTodoList={fetchTodoList}
             toggleDone={toggleDone}
             deleteTodo={deleteTodo}
+            addNewComment={addNewComment}
           />
         ))}
       </ul>
