@@ -16,7 +16,7 @@ CORS(app)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todos.db'
 
-app.comfig['JWT_SECRET_KEY'] = 'fdsjkfjioi2rjshr2345hrsh043j5oij5545'
+app.config['JWT_SECRET_KEY'] = 'fdsjkfjioi2rjshr2345hrsh043j5oij5545'
 jwt = JWTManager(app)
 
 class Base(DeclarativeBase):
@@ -72,7 +72,7 @@ def toggle_todo(id):
 @app.route('/api/todos/<int:id>/', methods=['DELETE'])
 def delete_todo(id):
     todo = TodoItem.query.get_or_404(id)
-    db.session.selete(todo)
+    db.session.delete(todo)
     db.session.commit()
     return jsonify({'message':'Todo deleted successfully'})
 
