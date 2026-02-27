@@ -2,14 +2,9 @@ import { render, screen } from '@testing-library/react'
 import { vi } from 'vitest'
 import App from '../App.jsx'
 
-const mockResponse = (body, ok = true) =>
-  Promise.resolve({
-    ok,
-    json: () => Promise.resolve(body),
-});
-
 describe('App', () => {
   beforeEach(() => {
+    localStorage.clear();
     vi.stubGlobal('fetch', vi.fn());
   });
 
@@ -18,22 +13,8 @@ describe('App', () => {
     vi.unstubAllGlobals();
   });
 
-  it('renders correctly', async () => {
-    global.fetch.mockImplementationOnce(() =>
-      mockResponse([
-        { id: 1, title: 'First todo', done: false, comments: [] },
-        { id: 2, title: 'Second todo', done: false, comments: [
-          { id: 1, message: 'First comment' },
-          { id: 2, message: 'Second comment' },
-        ] },
-      ]),
-    );
-
+  it('redirects to login when not authenticated', async () => {
     render(<App />);
-
-    expect(await screen.findByText('First todo')).toBeInTheDocument();
-    expect(await screen.findByText('Second todo')).toBeInTheDocument();
-    expect(await screen.findByText('First comment')).toBeInTheDocument();
-    expect(await screen.findByText('Second comment')).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Login' })).toBeInTheDocument();
   });
 });
